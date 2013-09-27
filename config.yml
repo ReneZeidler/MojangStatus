@@ -1,0 +1,96 @@
+# 
+# All strings use & as the color code character
+# 
+# Interval in which the status is checked (in seconds)
+
+debug: false
+# All strings use & as the color code character
+# 
+# Interval in which the status is checked (in seconds)
+checkInterval: 30
+# MOTD messages, shown when the corresponding services are down. %motd% gets replaced with the standard MOTD
+# Session servers are down, probably cannot join
+sessionsDown: '&4Session-Server&c down -- leider möglicherweise &4kein Joinen&c möglich!'
+# Session and login servers are down, probably cannot join or log in after restarting game
+sessionsAndLoginDown: '&4Session- und Login-Server&c down -- leider möglicherweise
+  &4kein Joinen&c möglich!'
+# Login servers are down, can join but cannot log back in after restarting Minecraft
+loginDown: '&4Login-Server&c down &r-- %motd%'
+# The following messages are added additionally to the top ones. If you don't include %motd% they may overwrite the more important messages.
+# Skin servers are down, skins may not be displayed correctly
+skinsDown: '%motd%&c (&4Skin-Server&c down)'
+# Minecraft.net is down, e.g. cannot access profile to change skin
+minecraftNetDown: '%motd%&c (&4minecraft.net&c down)'
+# Skin servers and minecraft.net are down
+skinsAndMinecraftNetDown: '%motd%&c (&4Skin-Server und minecraft.net&c down)'
+# 
+# 
+# Output of the /mojangstatus command, %status% in status messages gets replaced with the color coded status of the service
+# Line at the beginning of the output
+commandCheckHeader: '&9Status der wichtigen Mojang-Dienste:'
+# Status of the website minecraft.net
+commandCheckStatusMinecraftNet: '&eDie Website &6minecraft.net&e ist gerade %status%'
+# Status of the login servers (Yggdrasil)
+commandCheckStatusAuthserverMojang: '&eDie &6Login-Server&e sind gerade %status%'
+# Status of the session servers
+commandCheckStatusSessionMinecraft: '&eDie &6Session-Server&e sind gerade %status%'
+# Status of the skin servers
+commandCheckStatusSkinsMinecraft: '&eDie &6Skin-Server&e sind gerade %status%'
+# Warning when session servers are offline (no players can join)
+commandCheckWarningSessionOffline: '&cEs können zur Zeit keine neuen Spieler joinen!'
+# Warning when login servers are offline (only logged in players can join)
+commandCheckWarningLoginOffline: '&cEs können zur Zeit nur Spieler joinen, die bereits
+  in Minecraft eingeloggt sind!'
+# Warning when skin servers are offline
+commandCheckWarningSkinsOffline: '&cEs können zur Zeit Probleme mit den Skins auftretren!'
+# Header for the second part of the output, less important services
+commandCheckHeader2: '&9Weitere Mojang-Dienste:'
+# Status of the legacy mojang account servers
+commandCheckStatusAuthMojang: '&fDie alten Mojang-Account &eLogin-Server&f sind gerade
+  %status%'
+# Status of the mojang account website
+commandCheckStatusAccountMojang: '&fDie &eMojang-Account&f Website ist gerade %status%'
+# Status of the legacy login servers
+commandCheckStatusLoginMinecraft: '&fDie alten &eLogin-Server&f sind gerade %status%'
+# 
+# 
+# Public broadcasts when a service goes up or down. Use 
+#  for multiple lines. Leave empty to disable.
+# Service went down
+broadcastMinecraftNetDown: ''
+broadcastAuthserverMojangDown: |-
+  &cDie &lLogin-Server&c sind soeben &4offline&c gegangen.
+  &cEs können sich vermutlich keine weiteren Spieler mehr in Minecraft einloggen!
+broadcastSessionMinecraftDown: |-
+  &cDie &lSession-Server&c sind soeben &4offline&c gegangen.
+  &cEs können vermutlich keine weiteren Spieler mehr joinen!
+broadcastSkinsMinecraftDown: ''
+broadcastAuthMojangDown: ''
+broadcastAccountMojangDown: ''
+broadcastLoginMinecraftDown: ''
+# Service goes up
+broadcastMinecraftNetUp: ''
+# Show broadcast that login servers are still down when session servers go up to avoid confusion
+broadcastLoginStillDownOnSessionUp: true
+broadcastAuthserverMojangUp: '&aDie &lLogin-Server&a sind soeben &2online&a gegangen.'
+# Show broadcast that session servers are still down when login servers go up to avoid confusion
+broadcastSessionStillDownOnLoginUp: true
+broadcastSessionMinecraftUp: |-
+  &aDie &lSession-Server&a sind soeben &2online&a gegangen.
+  &aEs können wieder weitere Spieler joinen!
+broadcastSkinsMinecraftUp: ''
+broadcastAuthMojangUp: ''
+broadcastAccountMojangUp: ''
+broadcastLoginMinecraftUp: ''
+# Public broadcasts when a service is still down after a certain amount of time.
+# Number of continuous checks where the service is offline until the message gets shown (e.g. with check interval 30s a value of 20 means a broadcast after 10 minutes)
+remainsDownInterval: 20
+broadcastMinecraftNetStillDown: ''
+broadcastAuthserverMojangStillDown: '&cDie &lLogin-Server&c sind immer noch &4offline&c,
+  es können sich keine weiteren Spieler in Minecraft einloggen!'
+broadcastSessionMinecraftStillDown: '&cDie &lSession-Server&c sind immer noch &4offline&c
+  und es können keine weiteren Spieler joinen!'
+broadcastSkinsMinecraftStillDown: ''
+broadcastAuthMojangStillDown: ''
+broadcastAccountMojangStillDown: ''
+broadcastLoginMinecraftStillDown: ''
