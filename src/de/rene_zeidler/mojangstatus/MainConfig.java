@@ -17,6 +17,7 @@ public class MainConfig extends Config {
 		}
 	}
 	
+	//Debugging enables a more detailed logging
 	public boolean debug = false;
 	@Comment(value = "All strings use & as the color code character\n\nInterval in which the status is checked (in seconds)")
 	public int checkInterval = 30;

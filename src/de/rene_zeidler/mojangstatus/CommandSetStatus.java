@@ -18,13 +18,17 @@ public class CommandSetStatus extends Command {
 			sender.sendMessage(ChatColor.RED  + "Wrong number of arguments. Use /setstatus <server> <online|offline>");
 			return;
 		}
-		boolean online = false;
+		
+		//Parse second argument (online/offline)
+		boolean online = false;	//To what to set the status on (true is online, false is offline)
 		if(args[1].equalsIgnoreCase("online") || args[1].equalsIgnoreCase("true")) online = true;
 		else if(args[1].equalsIgnoreCase("offline") || args[1].equalsIgnoreCase("false")) online = false;
 		else {
 			sender.sendMessage(ChatColor.RED  + "Second argument must be \"online\" or \"offline\"");
 			return;
 		}
+		
+		//Parse the first argument and set the status of the service
 		if(args[0].equalsIgnoreCase("minecraftNet") || args[0].equalsIgnoreCase("website") || args[0].equalsIgnoreCase("minecraft.net")) MojangStatus.getInstance().setMinecraftNetStatus(online);
 		else if(args[0].equalsIgnoreCase("authServerMojang") || args[0].equalsIgnoreCase("login") || args[0].equalsIgnoreCase("authserver.mojang.com")) MojangStatus.getInstance().setAuthServerMojangStatus(online);
 		else if(args[0].equalsIgnoreCase("sessionMinecraft") || args[0].equalsIgnoreCase("session") || args[0].equalsIgnoreCase("session.minecraft.net")) MojangStatus.getInstance().setSessionMinecraftStatus(online);
