@@ -42,13 +42,16 @@ public class MojangStatus extends Plugin implements Listener {
 	 * Current status of the service authserver.mojang.com
 	 */
 	public static boolean authserverMojang = true;
-	public int minecraftNetDowntimer = 0;
-	public int loginMinecraftDowntimer = 0;
-	public int sessionMinecraftDowntimer = 0;
-	public int accountMojangDowntimer = 0;
-	public int authMojangDowntimer = 0;
-	public int skinsMinecraftDowntimer = 0;
-	public int authserverMojangDowntimer = 0;
+	
+	//How long (in number of checks) the status of the server hasn't changed
+	public int minecraftNetUnchangedTimer = 0;
+	public int loginMinecraftUnchangedTimer = 0;
+	public int sessionMinecraftUnchangedTimer = 0;
+	public int accountMojangUnchangedTimer = 0;
+	public int authMojangUnchangedTimer = 0;
+	public int skinsMinecraftUnchangedTimer = 0;
+	public int authserverMojangUnchangedTimer = 0;
+	
 	/**
 	 * Static instance of the plugin itself
 	 * Can be accessed with getInstance() 
@@ -112,21 +115,19 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setMinecraftNetStatus(boolean online)
 	{
-		if(minecraftNet != online) {	//status has changed
+		if(minecraftNet != online) {
+			//status has changed
+			minecraftNetUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Minecraft.net just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				minecraftNetDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastMinecraftNetUp);
-			}
-			else broadcast(config.broadcastMinecraftNetDown);
-		} else if(!online) {	//status remains offline
-			minecraftNetDowntimer++;	//increment timer
-			if(minecraftNetDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastMinecraftNetStillDown);
-				minecraftNetDowntimer = 0;	//reset timer
-			}
+		} else {
+			//status is unchanged
+			minecraftNetUnchangedTimer++;
+			if(!online && minecraftNetUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastMinecraftNetStillDown); //service still down and interval elapsed
 		}
-		minecraftNet = online;	//set attribute to new status
+		
+		if(online && minecraftNetUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastMinecraftNetUp); //service went up and waiting time elapsed
+		else if(!online && minecraftNetUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastMinecraftNetDown); //service went down and waiting time elapsed
+		minecraftNet = online; //set attribute to new status
 	}
 	
 	/**
@@ -135,21 +136,19 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setLoginMinecraftStatus(boolean online)
 	{
-		if(loginMinecraft != online) {	//status has changed
+		if(loginMinecraft != online) {
+			//status has changed
+			loginMinecraftUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Login servers (legacy) just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				loginMinecraftDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastLoginMinecraftUp);
-			}
-			else broadcast(config.broadcastLoginMinecraftDown);
-		} else if(!online) {	//status remains offline
-			loginMinecraftDowntimer++;	//increment timer
-			if(loginMinecraftDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastLoginMinecraftStillDown);
-				loginMinecraftDowntimer = 0;	//reset timer
-			}
+		} else {
+			//status is unchanged
+			loginMinecraftUnchangedTimer++;
+			if(!online && loginMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastLoginMinecraftStillDown); //service still down and interval elapsed
 		}
-		loginMinecraft = online;	//set attribute to new status
+		
+		if(online && loginMinecraftUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastLoginMinecraftUp); //service went up and waiting time elapsed
+		else if(!online && loginMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastLoginMinecraftDown); //service went down and waiting time elapsed
+		loginMinecraft = online; //set attribute to new status
 	}
 	
 	/**
@@ -158,23 +157,22 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setSessionMinecraftStatus(boolean online)
 	{
-		if(sessionMinecraft != online) {	//status has changed
+		if(sessionMinecraft != online) {
+			//status has changed
+			sessionMinecraftUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Session servers (legacy) just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				sessionMinecraftDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastSessionMinecraftUp);
-				//special broadcast when login servers are still down
-				if(!authserverMojang && config.broadcastLoginStillDownOnSessionUp) broadcast(config.broadcastAuthserverMojangStillDown);
-			}
-			else broadcast(config.broadcastSessionMinecraftDown);
-		} else if(!online) {	//status remains offline
-			sessionMinecraftDowntimer++;	//increment timer
-			if(sessionMinecraftDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastSessionMinecraftStillDown);
-				sessionMinecraftDowntimer = 0;	//reset timer
-			}
-		} 
-		sessionMinecraft = online;	//set attribute to new status
+		} else {
+			//status is unchanged
+			sessionMinecraftUnchangedTimer++;
+			if(!online && sessionMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastSessionMinecraftStillDown); //service still down and interval elapsed
+		}
+		
+		if(online && sessionMinecraftUnchangedTimer == config.broadcastUpWait) {
+			broadcast(config.broadcastSessionMinecraftUp); //service went up and waiting time elapsed
+			if(!authserverMojang && config.broadcastLoginStillDownOnSessionUp) broadcast(config.broadcastAuthserverMojangStillDown); //special broadcast when login servers are still down
+		}
+		else if(!online && sessionMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastSessionMinecraftDown); //service went down and waiting time elapsed
+		sessionMinecraft = online; //set attribute to new status
 	}
 	
 	/**
@@ -183,21 +181,19 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setAccountMojangStatus(boolean online)
 	{
-		if(accountMojang != online) {	//status has changed
+		if(accountMojang != online) {
+			//status has changed
+			accountMojangUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Mojang accounts website just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				accountMojangDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastAccountMojangUp);
-			}
-			else broadcast(config.broadcastAccountMojangDown);
-		} else if(!online) {	//status remains offline
-			accountMojangDowntimer++;	//increment timer
-			if(accountMojangDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastAccountMojangStillDown);
-				accountMojangDowntimer = 0;	//reset timer
-			}
+		} else {
+			//status is unchanged
+			accountMojangUnchangedTimer++;
+			if(!online && accountMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAccountMojangStillDown); //service still down and interval elapsed
 		}
-		accountMojang = online;	//set attribute to new status
+		
+		if(online && accountMojangUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastAccountMojangUp); //service went up and waiting time elapsed
+		else if(!online && accountMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAccountMojangDown); //service went down and waiting time elapsed
+		accountMojang = online; //set attribute to new status
 	}
 	
 	/**
@@ -206,21 +202,19 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setAuthMojangStatus(boolean online)
 	{
-		if(authMojang != online) {	//status has changed
+		if(authMojang != online) {
+			//status has changed
+			authMojangUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Mojang accounts login (legacy) just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				authMojangDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastAuthMojangUp);
-			}
-			else broadcast(config.broadcastAuthMojangDown);
-		} else if(!online) {	//status remains offline
-			authMojangDowntimer++;	//increment timer
-			if(authMojangDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastAuthMojangStillDown);
-				authMojangDowntimer = 0;	//reset timer
-			}
-		} 
-		authMojang = online;	//set attribute to new status
+		} else {
+			//status is unchanged
+			authMojangUnchangedTimer++;
+			if(!online && authMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAuthMojangStillDown);  //service still down and interval elapsed
+		}
+		
+		if(online && authMojangUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastAuthMojangUp); //service went up and waiting time elapsed
+		else if(!online && authMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAuthMojangDown); //service went down and waiting time elapsed
+		authMojang = online; //set attribute to new status
 	}
 	
 	/**
@@ -229,21 +223,19 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setSkinsMinecraftStatus(boolean online)
 	{
-		if(skinsMinecraft != online) {	//status has changed
+		if(skinsMinecraft != online) {
+			//status has changed
+			skinsMinecraftUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Skin servers just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				skinsMinecraftDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastSkinsMinecraftUp);
-			}
-			else broadcast(config.broadcastSkinsMinecraftDown);
-		} else if(!online) {	//status remains offline
-			skinsMinecraftDowntimer++;	//increment timer
-			if(skinsMinecraftDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastSkinsMinecraftStillDown);
-				skinsMinecraftDowntimer = 0;	//reset timer
-			}
+		} else {
+			//status is unchanged
+			skinsMinecraftUnchangedTimer++;
+			if(!online && skinsMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastSkinsMinecraftStillDown);  //service still down and interval elapsed
 		}
-		skinsMinecraft = online;	//set attribute to new status
+		
+		if(online && skinsMinecraftUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastSkinsMinecraftUp); //service went up and waiting time elapsed
+		else if(!online && skinsMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastSkinsMinecraftDown); //service went down and waiting time elapsed
+		skinsMinecraft = online; //set attribute to new status
 	}
 	
 	/**
@@ -252,23 +244,22 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public void setAuthServerMojangStatus(boolean online)
 	{
-		if(authserverMojang != online) {	//status has changed
+		if(authserverMojang != online) {
+			//status has changed
+			authserverMojangUnchangedTimer = 0;
 			getLogger().log(Level.INFO, "Authentification service (Minecraft login) just went " + (online ? "online" : "offline"));
-			if(online) {	//status changed to online
-				authserverMojangDowntimer = 0;	//set downtime timer to 0
-				broadcast(config.broadcastAuthserverMojangUp);
-				//special broadcast when session servers are still down
-				if(!sessionMinecraft && config.broadcastSessionStillDownOnLoginUp) broadcast(config.broadcastSessionMinecraftStillDown);
-			}
-			else broadcast(config.broadcastAuthserverMojangDown);
-		} else if(!online) {	//status remains offline
-			authserverMojangDowntimer++;	//increment timer
-			if(authserverMojangDowntimer >= config.remainsDownInterval) {	//timer exceeded limit
-				broadcast(config.broadcastAuthserverMojangStillDown);
-				authserverMojangDowntimer = 0;	//reset timer
-			}
+		} else {
+			//status is unchanged
+			authserverMojangUnchangedTimer++;
+			if(!online && authserverMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAuthserverMojangStillDown);  //service still down and interval elapsed
 		}
-		authserverMojang = online;	//set attribute to new status
+		
+		if(online && authserverMojangUnchangedTimer == config.broadcastUpWait) {
+			broadcast(config.broadcastAuthserverMojangUp); //service went up and waiting time elapsed
+			if(!sessionMinecraft && config.broadcastSessionStillDownOnLoginUp) broadcast(config.broadcastSessionMinecraftStillDown); //special broadcast when session servers are still down
+		}
+		else if(!online && authserverMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAuthserverMojangDown); //service went down and waiting time elapsed
+		authserverMojang = online; //set attribute to new status
 	}
 	
 	@EventHandler

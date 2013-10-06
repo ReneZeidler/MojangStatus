@@ -59,7 +59,8 @@ public class MainConfig extends Config {
 	@Comment(value = "Status of the legacy login servers")
 	public String commandCheckStatusLoginMinecraft = "&fDie alten &eLogin-Server&f sind gerade %status%";
 	
-	@Comment(value = "\n\nPublic broadcasts when a service goes up or down. Use \n for multiple lines. Leave empty to disable.\nService went down")
+	@Comment(value = "\n\nPublic broadcasts when a service goes up or down. Use \n for multiple lines. Leave empty to disable.\nService went down\nAfter how many checks the broadcast should be displayed when a service goes down (0 = instantly, 2 = after the second check)? Avoids spamming the chat when the servers are just down for a short time")
+	public int broadcastDownWait = 2;
 	public String broadcastMinecraftNetDown = "";
 	public String broadcastAuthserverMojangDown = "&cDie &lLogin-Server&c sind soeben &4offline&c gegangen.\n&cEs können sich vermutlich keine weiteren Spieler mehr in Minecraft einloggen!";
 	public String broadcastSessionMinecraftDown = "&cDie &lSession-Server&c sind soeben &4offline&c gegangen.\n&cEs können vermutlich keine weiteren Spieler mehr joinen!";
@@ -67,7 +68,8 @@ public class MainConfig extends Config {
 	public String broadcastAuthMojangDown = "";
 	public String broadcastAccountMojangDown = "";
 	public String broadcastLoginMinecraftDown = "";
-	@Comment(value = "Service goes up")
+	@Comment(value = "Service goes up\nAfter how many checks the broadcast should be displayed when a service goes up?")
+	public int broadcastUpWait = 1;
 	public String broadcastMinecraftNetUp = "";
 	@Comment(value = "Show broadcast that login servers are still down when session servers go up to avoid confusion")
 	public boolean broadcastLoginStillDownOnSessionUp = true;
