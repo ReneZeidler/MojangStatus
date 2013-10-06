@@ -3,19 +3,27 @@ package de.rene_zeidler.mojangstatus;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.PluginDescription;
 
 public class CommandMCStatus extends Command {
 	MainConfig config;
 	
 	public CommandMCStatus()
 	{
-		super("mojangstatus", "mojangstatus.check", "mcstatus", "mcs");
+		super("mojangstatus", null, "mcstatus", "mcs");
 		config = MojangStatus.getInstance().getConfig();
 	}
 
 	@Override
 	public void execute(CommandSender sender, String[] args)
 	{
+		if(args.length == 1 && (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver"))) {
+			//output version
+			PluginDescription desc = MojangStatus.getInstance().getDescription();
+			sender.sendMessage(ChatColor.DARK_AQUA + (ChatColor.BOLD + desc.getName() + ChatColor.AQUA + " version " + desc.getVersion()));
+			return;
+		}
+		
 		//Just parse the messages from the config and send it one after another
 		sender.sendMessage(parseMessage(config.commandCheckHeader));
 		sender.sendMessage(parseMessage(config.commandCheckStatusMinecraftNet, MojangStatus.minecraftNet, false));

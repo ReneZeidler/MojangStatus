@@ -268,23 +268,23 @@ public class MojangStatus extends Plugin implements Listener {
 		//store original MOTD
 		String modt = ev.getResponse().getMotd();
 		
-		if(!sessionMinecraft && !authserverMojang) {	//session + login offline
+		if(!sessionMinecraft && !authserverMojang) { //session + login offline
 			modt = parseModt(config.sessionsAndLoginDown, modt);
-		} else if(!sessionMinecraft) {	//only session offline
+		} else if(!sessionMinecraft) { //only session offline
 			modt = parseModt(config.sessionsDown, modt);
-		} else if(!authserverMojang) {	//only login offline
+		} else if(!authserverMojang) { //only login offline
 			modt = parseModt(config.loginDown, modt);
 		}
 		
-		if(!skinsMinecraft && !minecraftNet) {			//skins and minecraft.net offline
+		if(!skinsMinecraft && !minecraftNet) { //skins and minecraft.net offline
 			modt = parseModt(config.skinsAndMinecraftNetDown, modt);
-		} else if(!skinsMinecraft) {	//only skins offline
+		} else if(!skinsMinecraft) { //only skins offline
 			modt = parseModt(config.skinsDown, modt);
-		} else if(!minecraftNet) {		//only minecraft.net offline
+		} else if(!minecraftNet) { //only minecraft.net offline
 			modt = parseModt(config.minecraftNetDown, modt);
 		}
 		
-		if(modt != ev.getResponse().getMotd()) {	//MOTD was changed
+		if(modt != ev.getResponse().getMotd()) { //MOTD was changed
 			//create new ServerPing with changed MOTD
 			ServerPing sp = new ServerPing(
 					ev.getResponse().getProtocolVersion(),
@@ -292,13 +292,13 @@ public class MojangStatus extends Plugin implements Listener {
 					modt,
 					ev.getResponse().getCurrentPlayers(),
 					ev.getResponse().getMaxPlayers());
-			ev.setResponse(sp);	//replace ServerPing in the event
+			ev.setResponse(sp); //replace ServerPing in the event
 		}
 	}
 	
 	/**
 	 * Parses an MOTD string
-	 * Replaces %modt% with the old MODT and translates color codes with &
+	 * Replaces %motd% with the old MODT and translates color codes with &
 	 * @param s Original String
 	 * @param motd Old MOTD
 	 * @return Parsed string
