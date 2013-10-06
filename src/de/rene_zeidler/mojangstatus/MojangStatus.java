@@ -44,13 +44,13 @@ public class MojangStatus extends Plugin implements Listener {
 	public static boolean authserverMojang = true;
 	
 	//How long (in number of checks) the status of the server hasn't changed
-	public int minecraftNetUnchangedTimer = 0;
-	public int loginMinecraftUnchangedTimer = 0;
-	public int sessionMinecraftUnchangedTimer = 0;
-	public int accountMojangUnchangedTimer = 0;
-	public int authMojangUnchangedTimer = 0;
-	public int skinsMinecraftUnchangedTimer = 0;
-	public int authserverMojangUnchangedTimer = 0;
+	public int minecraftNetUnchangedTimer;
+	public int loginMinecraftUnchangedTimer;
+	public int sessionMinecraftUnchangedTimer;
+	public int accountMojangUnchangedTimer;
+	public int authMojangUnchangedTimer;
+	public int skinsMinecraftUnchangedTimer;
+	public int authserverMojangUnchangedTimer;
 	
 	/**
 	 * Static instance of the plugin itself
@@ -82,6 +82,15 @@ public class MojangStatus extends Plugin implements Listener {
 	public void onEnable()
 	{
 		this.config = new MainConfig(this);
+		
+		//set initial value of unchanged timers to config.broadcastUpWait to avoid a broadcast on startup
+		minecraftNetUnchangedTimer = config.broadcastUpWait;
+		loginMinecraftUnchangedTimer = config.broadcastUpWait;
+		sessionMinecraftUnchangedTimer = config.broadcastUpWait;
+		accountMojangUnchangedTimer = config.broadcastUpWait;
+		authMojangUnchangedTimer = config.broadcastUpWait;
+		skinsMinecraftUnchangedTimer = config.broadcastUpWait;
+		authserverMojangUnchangedTimer = config.broadcastUpWait;
 		
 		//register Listener/Commands
 		BungeeCord.getInstance().getPluginManager().registerListener(this, this);
