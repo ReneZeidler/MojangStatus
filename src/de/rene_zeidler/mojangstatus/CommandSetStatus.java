@@ -1,14 +1,17 @@
 package de.rene_zeidler.mojangstatus;
 
+import de.rene_zeidler.mojangstatus.MojangStatus.Service;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 
 public class CommandSetStatus extends Command {
+	MojangStatus ms;
 	
 	public CommandSetStatus()
 	{
 		super("setstatus", "mojangstatus.set", "setmcs");
+		ms = MojangStatus.getInstance();
 	}
 
 	@Override
@@ -21,7 +24,7 @@ public class CommandSetStatus extends Command {
 		
 		//Parse second argument (online/offline)
 		boolean online = false;	//To what to set the status on (true is online, false is offline)
-		if(args[1].equalsIgnoreCase("online") || args[1].equalsIgnoreCase("true")) online = true;
+		     if(args[1].equalsIgnoreCase("online")  || args[1].equalsIgnoreCase("true") ) online = true;
 		else if(args[1].equalsIgnoreCase("offline") || args[1].equalsIgnoreCase("false")) online = false;
 		else {
 			sender.sendMessage(ChatColor.RED  + "Second argument must be \"online\" or \"offline\"");
@@ -29,13 +32,13 @@ public class CommandSetStatus extends Command {
 		}
 		
 		//Parse the first argument and set the status of the service
-		if(args[0].equalsIgnoreCase("minecraftNet") || args[0].equalsIgnoreCase("website") || args[0].equalsIgnoreCase("minecraft.net")) MojangStatus.getInstance().setMinecraftNetStatus(online);
-		else if(args[0].equalsIgnoreCase("authServerMojang") || args[0].equalsIgnoreCase("login") || args[0].equalsIgnoreCase("authserver.mojang.com")) MojangStatus.getInstance().setAuthServerMojangStatus(online);
-		else if(args[0].equalsIgnoreCase("sessionMinecraft") || args[0].equalsIgnoreCase("session") || args[0].equalsIgnoreCase("session.minecraft.net")) MojangStatus.getInstance().setSessionMinecraftStatus(online);
-		else if(args[0].equalsIgnoreCase("skinsMinecraft") || args[0].equalsIgnoreCase("skins") || args[0].equalsIgnoreCase("skins.minecraft.net")) MojangStatus.getInstance().setSkinsMinecraftStatus(online);
-		else if(args[0].equalsIgnoreCase("authMojang") || args[0].equalsIgnoreCase("auth") || args[0].equalsIgnoreCase("auth.mojang.com")) MojangStatus.getInstance().setAuthMojangStatus(online);
-		else if(args[0].equalsIgnoreCase("accountMojang") || args[0].equalsIgnoreCase("account") || args[0].equalsIgnoreCase("account.mojang.com")) MojangStatus.getInstance().setAccountMojangStatus(online);
-		else if(args[0].equalsIgnoreCase("loginMinecraft") || args[0].equalsIgnoreCase("legacylogin") || args[0].equalsIgnoreCase("login.minecraft.net")) MojangStatus.getInstance().setLoginMinecraftStatus(online);
+		     if(args[0].equalsIgnoreCase("minecraftNet")     || args[0].equalsIgnoreCase("website")     || args[0].equalsIgnoreCase("minecraft.net"))         ms.setStatus(Service.MINECRAFTNET,     online);
+		else if(args[0].equalsIgnoreCase("authServerMojang") || args[0].equalsIgnoreCase("login")       || args[0].equalsIgnoreCase("authserver.mojang.com")) ms.setStatus(Service.AUTHSERVERMOJANG, online);
+		else if(args[0].equalsIgnoreCase("sessionMinecraft") || args[0].equalsIgnoreCase("session")     || args[0].equalsIgnoreCase("session.minecraft.net")) ms.setStatus(Service.SESSIONMINECRAFT, online);
+		else if(args[0].equalsIgnoreCase("skinsMinecraft")   || args[0].equalsIgnoreCase("skins")       || args[0].equalsIgnoreCase("skins.minecraft.net"))   ms.setStatus(Service.SKINSMINECRAFT,   online);
+		else if(args[0].equalsIgnoreCase("authMojang")       || args[0].equalsIgnoreCase("auth")        || args[0].equalsIgnoreCase("auth.mojang.com"))       ms.setStatus(Service.AUTHMOJANG,       online);
+		else if(args[0].equalsIgnoreCase("accountMojang")    || args[0].equalsIgnoreCase("account")     || args[0].equalsIgnoreCase("account.mojang.com"))    ms.setStatus(Service.ACCOUNTMOJANG,    online);
+		else if(args[0].equalsIgnoreCase("loginMinecraft")   || args[0].equalsIgnoreCase("legacylogin") || args[0].equalsIgnoreCase("login.minecraft.net"))   ms.setStatus(Service.LOGINMINECRAFT,   online);
 		else {
 			sender.sendMessage(ChatColor.RED  + "Unknown server, please use the server address or the service name");
 			return;

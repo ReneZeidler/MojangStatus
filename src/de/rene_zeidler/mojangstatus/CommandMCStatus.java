@@ -1,5 +1,6 @@
 package de.rene_zeidler.mojangstatus;
 
+import de.rene_zeidler.mojangstatus.MojangStatus.Service;
 import net.craftminecraft.bungee.bungeeyaml.bukkitapi.InvalidConfigurationException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -7,12 +8,14 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.PluginDescription;
 
 public class CommandMCStatus extends Command {
+	MojangStatus ms;
 	MainConfig config;
 	
 	public CommandMCStatus()
 	{
 		super("mojangstatus", null, "mcstatus", "mcs");
-		config = MojangStatus.getInstance().getConfig();
+		ms = MojangStatus.getInstance();
+		config = ms.getConfig();
 	}
 
 	@Override
@@ -38,17 +41,17 @@ public class CommandMCStatus extends Command {
 		
 		//Just parse the messages from the config and send it one after another
 		sender.sendMessage(parseMessage(config.commandCheckHeader));
-		sender.sendMessage(parseMessage(config.commandCheckStatusMinecraftNet, MojangStatus.minecraftNet, false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusAuthserverMojang, MojangStatus.authserverMojang, false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusSessionMinecraft, MojangStatus.sessionMinecraft, false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusSkinsMinecraft, MojangStatus.skinsMinecraft, false));
-		if(!MojangStatus.sessionMinecraft) sender.sendMessage(parseMessage(config.commandCheckWarningSessionOffline));		//Warning when session servers are offline
-		else if(!MojangStatus.authserverMojang) sender.sendMessage(parseMessage(config.commandCheckWarningLoginOffline));	//Warning when login servers are offline
-		if(!MojangStatus.skinsMinecraft) sender.sendMessage(parseMessage(config.commandCheckWarningSkinsOffline));			//Warning when skin servers are offline
+		sender.sendMessage(parseMessage(config.commandCheckStatusMinecraftNet,     ms.getStatus(Service.MINECRAFTNET),     false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusAuthserverMojang, ms.getStatus(Service.AUTHSERVERMOJANG), false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusSessionMinecraft, ms.getStatus(Service.SESSIONMINECRAFT), false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusSkinsMinecraft,   ms.getStatus(Service.SKINSMINECRAFT),   false));
+		if(!ms.getStatus(Service.SESSIONMINECRAFT))      sender.sendMessage(parseMessage(config.commandCheckWarningSessionOffline)); //Warning when session servers are offline
+		else if(!ms.getStatus(Service.AUTHSERVERMOJANG)) sender.sendMessage(parseMessage(config.commandCheckWarningLoginOffline));   //Warning when login servers are offline
+		if(!ms.getStatus(Service.SKINSMINECRAFT))        sender.sendMessage(parseMessage(config.commandCheckWarningSkinsOffline));   //Warning when skin servers are offline
 		sender.sendMessage(parseMessage(config.commandCheckHeader2));
-		sender.sendMessage(parseMessage(config.commandCheckStatusAuthMojang, MojangStatus.authMojang, true));
-		sender.sendMessage(parseMessage(config.commandCheckStatusAccountMojang, MojangStatus.accountMojang, true));
-		sender.sendMessage(parseMessage(config.commandCheckStatusLoginMinecraft, MojangStatus.loginMinecraft, true));
+		sender.sendMessage(parseMessage(config.commandCheckStatusAuthMojang,       ms.getStatus(Service.AUTHMOJANG),       true));
+		sender.sendMessage(parseMessage(config.commandCheckStatusAccountMojang,    ms.getStatus(Service.ACCOUNTMOJANG),    true));
+		sender.sendMessage(parseMessage(config.commandCheckStatusLoginMinecraft,   ms.getStatus(Service.LOGINMINECRAFT),   true));
 	}
 	
 	/**

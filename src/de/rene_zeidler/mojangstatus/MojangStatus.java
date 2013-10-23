@@ -1,5 +1,6 @@
 package de.rene_zeidler.mojangstatus;
 
+import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -13,52 +14,36 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventHandler;
 
 public class MojangStatus extends Plugin implements Listener {
-	/**
-	 * Current status of the service minecraft.net
-	 */
-	public static boolean minecraftNet = true;
-	/**
-	 * Current status of the service login.minecraft.net
-	 */
-	public static boolean loginMinecraft = true;
-	/**
-	 * Current status of the service session.minecraft.net
-	 */
-	public static boolean sessionMinecraft = true;
-	/**
-	 * Current status of the service account.mojang.com
-	 */
-	public static boolean accountMojang = true;
-	/**
-	 * Current status of the service auth.mojang.com
-	 */
-	public static boolean authMojang = true;
-	/**
-	 * Current status of the service skins.minecraft.net
-	 */
-	public static boolean skinsMinecraft = true;
-	/**
-	 * Current status of the service authserver.mojang.com
-	 */
-	public static boolean authserverMojang = true;
 	
-	//The last status that has been broadcasted
-	public static boolean minecraftNetBroadcasted = true;
-	public static boolean loginMinecraftBroadcasted = true;
-	public static boolean sessionMinecraftBroadcasted = true;
-	public static boolean accountMojangBroadcasted = true;
-	public static boolean authMojangBroadcasted = true;
-	public static boolean skinsMinecraftBroadcasted = true;
-	public static boolean authserverMojangBroadcasted = true;
+	public static enum Service {
+		MINECRAFTNET,
+		LOGINMINECRAFT,
+		SESSIONMINECRAFT,
+		ACCOUNTMOJANG,
+		AUTHMOJANG,
+		SKINSMINECRAFT,
+		AUTHSERVERMOJANG
+	}
 	
-	//How long (in number of checks) the status of the server hasn't changed
-	public int minecraftNetUnchangedTimer = 0;
-	public int loginMinecraftUnchangedTimer = 0;
-	public int sessionMinecraftUnchangedTimer = 0;
-	public int accountMojangUnchangedTimer = 0;
-	public int authMojangUnchangedTimer = 0;
-	public int skinsMinecraftUnchangedTimer = 0;
-	public int authserverMojangUnchangedTimer = 0;
+	public static enum BroadcastType {
+		UP,
+		DOWN,
+		STILLDOWN
+	}
+	
+	/**
+	 * Current status of a service (true -> online, false -> offline)
+	 */
+	private EnumMap<Service, Boolean> currentStatus = new EnumMap<Service, Boolean>(Service.class);
+	/**
+	 * The status of a service that was last broadcasted
+	 */
+	private EnumMap<Service, Boolean> lastBroadcastedStatus = new EnumMap<Service, Boolean>(Service.class);
+	/**
+	 * How long the status of a service hasn't changed
+	 */
+	private EnumMap<Service, Integer> timerUnchanged = new EnumMap<Service, Integer>(Service.class);
+
 	
 	/**
 	 * Static instance of the plugin itself
@@ -67,7 +52,7 @@ public class MojangStatus extends Plugin implements Listener {
 	private static MojangStatus instance = null;
 	private MainConfig config;
 	private ScheduledTask task;
-	
+
 	/**
 	 * Returns the instance of the plugin
 	 * @return instance of MojangStatus
@@ -118,194 +103,140 @@ public class MojangStatus extends Plugin implements Listener {
 	}
 	
 	/**
-	 * Sets the status of the service minecraft.net
-	 * @param online true for online, false for offline
+	 * Returns the status of the given service that was last broadcasted
+	 * @param service
+	 * @return
 	 */
-	public void setMinecraftNetStatus(boolean online)
+	public boolean getLastBroadcastedStatus(Service service)
 	{
-		if(minecraftNet != online) {
-			//status has changed
-			minecraftNetUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Minecraft.net just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			minecraftNetUnchangedTimer++;
-			if(!online && minecraftNetUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastMinecraftNetStillDown); //service still down and interval elapsed
-		}
-		
-		if(online && !minecraftNetBroadcasted && minecraftNetUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastMinecraftNetUp); //service went up and waiting time elapsed
-		else if(!online && minecraftNetBroadcasted && minecraftNetUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastMinecraftNetDown); //service went down and waiting time elapsed
-		minecraftNet = online; //set attribute to new status
+		return lastBroadcastedStatus.containsKey(service) ? lastBroadcastedStatus.get(service) : true;
 	}
 	
 	/**
-	 * Sets the status of the service login.minecraft.net
-	 * @param online true for online, false for offline
+	 * Sets the status of a service and displays broadcasts if needed
+	 * @param service
+	 * @param online
 	 */
-	public void setLoginMinecraftStatus(boolean online)
+	public void setLastBroadcastedStatus(Service service, boolean newStatus)
 	{
-		if(loginMinecraft != online) {
-			//status has changed
-			loginMinecraftUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Login servers (legacy) just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			loginMinecraftUnchangedTimer++;
-			if(!online && loginMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastLoginMinecraftStillDown); //service still down and interval elapsed
-		}
-		
-		if(online && loginMinecraftUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastLoginMinecraftUp); //service went up and waiting time elapsed
-		else if(!online && loginMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastLoginMinecraftDown); //service went down and waiting time elapsed
-		loginMinecraft = online; //set attribute to new status
+		lastBroadcastedStatus.put(service, newStatus);
 	}
 	
 	/**
-	 * Sets the status of the service session.minecraft.net
-	 * @param online true for online, false for offline
+	 * Returns the time that the status of a service hasn't changed
+	 * @param service
+	 * @return
 	 */
-	public void setSessionMinecraftStatus(boolean online)
+	public int getUnchangedTime(Service service)
 	{
-		if(sessionMinecraft != online) {
-			//status has changed
-			sessionMinecraftUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Session servers (legacy) just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			sessionMinecraftUnchangedTimer++;
-			if(!online && sessionMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastSessionMinecraftStillDown); //service still down and interval elapsed
-		}
-		
-		if(online && sessionMinecraftUnchangedTimer == config.broadcastUpWait) {
-			broadcast(config.broadcastSessionMinecraftUp); //service went up and waiting time elapsed
-			if(!authserverMojang && config.broadcastLoginStillDownOnSessionUp) broadcast(config.broadcastAuthserverMojangStillDown); //special broadcast when login servers are still down
-		}
-		else if(!online && sessionMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastSessionMinecraftDown); //service went down and waiting time elapsed
-		sessionMinecraft = online; //set attribute to new status
+		return timerUnchanged.containsKey(service) ? timerUnchanged.get(service) : 0;
 	}
 	
 	/**
-	 * Sets the status of the service account.mojang.com
-	 * @param online true for online, false for offline
+	 * Sets the time that the status of a service hasn't changed
+	 * @param service
+	 * @param online
 	 */
-	public void setAccountMojangStatus(boolean online)
+	public void setUnchangedTime(Service service, int newTime)
 	{
-		if(accountMojang != online) {
-			//status has changed
-			accountMojangUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Mojang accounts website just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			accountMojangUnchangedTimer++;
-			if(!online && accountMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAccountMojangStillDown); //service still down and interval elapsed
-		}
-		
-		if(online && accountMojangUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastAccountMojangUp); //service went up and waiting time elapsed
-		else if(!online && accountMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAccountMojangDown); //service went down and waiting time elapsed
-		accountMojang = online; //set attribute to new status
+		timerUnchanged.put(service, newTime);
 	}
 	
 	/**
-	 * Sets the status of the service auth.mojang.com
-	 * @param online true for online, false for offline
+	 * Returns the current status of the given service
+	 * @param service
+	 * @return
 	 */
-	public void setAuthMojangStatus(boolean online)
+	public boolean getStatus(Service service)
 	{
-		if(authMojang != online) {
-			//status has changed
-			authMojangUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Mojang accounts login (legacy) just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			authMojangUnchangedTimer++;
-			if(!online && authMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAuthMojangStillDown);  //service still down and interval elapsed
-		}
-		
-		if(online && authMojangUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastAuthMojangUp); //service went up and waiting time elapsed
-		else if(!online && authMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAuthMojangDown); //service went down and waiting time elapsed
-		authMojang = online; //set attribute to new status
+		return currentStatus.containsKey(service) ? currentStatus.get(service) : true;
 	}
 	
 	/**
-	 * Sets the status of the service skins.minecraft.net
-	 * @param online true for online, false for offline
+	 * Sets the status of a service and displays broadcasts if needed
+	 * @param service
+	 * @param online
 	 */
-	public void setSkinsMinecraftStatus(boolean online)
+	public void setStatus(Service service, boolean newStatus)
 	{
-		if(skinsMinecraft != online) {
-			//status has changed
-			skinsMinecraftUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Skin servers just went " + (online ? "online" : "offline"));
-		} else {
+		boolean oldStatus = getStatus(service);
+		currentStatus.put(service, newStatus);
+		
+		if(oldStatus == newStatus) {
 			//status is unchanged
-			skinsMinecraftUnchangedTimer++;
-			if(!online && skinsMinecraftUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastSkinsMinecraftStillDown);  //service still down and interval elapsed
+			setUnchangedTime(service, getUnchangedTime(service) + 1); //increment timer by 1
+			if(!newStatus && getUnchangedTime(service) % config.remainsDownInterval == 0) //service is down and the remainsDownInterval has elapsed
+				broadcast(service, BroadcastType.STILLDOWN);
+		} else {
+			//status has changed
+			setUnchangedTime(service, 0); //reset timer
+			getLogger().log(Level.INFO, service.toString() + " just went " + (newStatus ? "online" : "offline"));
 		}
 		
-		if(online && skinsMinecraftUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastSkinsMinecraftUp); //service went up and waiting time elapsed
-		else if(!online && skinsMinecraftUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastSkinsMinecraftDown); //service went down and waiting time elapsed
-		skinsMinecraft = online; //set attribute to new status
+		//  is online &&  wasn't broadcasted before         && buffer time has elapsed
+		if( newStatus && !getLastBroadcastedStatus(service) && getUnchangedTime(service) == config.broadcastUpWait  ) {
+			broadcast(service, BroadcastType.UP  );
+			//Special broadcast when only one of the services for login + session goes up but the other is down
+			if(service == Service.AUTHSERVERMOJANG && !getStatus(Service.SESSIONMINECRAFT)) broadcast(Service.SESSIONMINECRAFT, BroadcastType.STILLDOWN);
+			if(service == Service.SESSIONMINECRAFT && !getStatus(Service.AUTHSERVERMOJANG)) broadcast(Service.AUTHSERVERMOJANG, BroadcastType.STILLDOWN);
+		}
+		// is offline &&  wasn't broadcasted before         && buffer time has elapsed
+		if(!newStatus &&  getLastBroadcastedStatus(service) && getUnchangedTime(service) == config.broadcastDownWait)
+			broadcast(service, BroadcastType.DOWN);
 	}
 	
 	/**
-	 * Sets the status of the service authserver.mojang.com
-	 * @param online true for online, false for offline
+	 * Gets the broadcast string for a service and type from the config
+	 * @param service
+	 * @param type
+	 * @return
 	 */
-	public void setAuthServerMojangStatus(boolean online)
+	public String getBroadcast(Service service, BroadcastType type)
 	{
-		if(authserverMojang != online) {
-			//status has changed
-			authserverMojangUnchangedTimer = 0;
-			getLogger().log(Level.INFO, "Authentification service (Minecraft login) just went " + (online ? "online" : "offline"));
-		} else {
-			//status is unchanged
-			authserverMojangUnchangedTimer++;
-			if(!online && authserverMojangUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastAuthserverMojangStillDown);  //service still down and interval elapsed
+		if(type == BroadcastType.UP) {
+			switch (service) {
+				case ACCOUNTMOJANG:    return config.broadcastAccountMojangUp;
+				case AUTHMOJANG:       return config.broadcastAuthMojangUp;
+				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangUp;
+				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftUp;
+				case MINECRAFTNET:     return config.broadcastMinecraftNetUp;
+				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftUp;
+				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftUp;
+			}
+		} else if(type == BroadcastType.DOWN) {
+			switch (service) {
+				case ACCOUNTMOJANG:    return config.broadcastAccountMojangDown;
+				case AUTHMOJANG:       return config.broadcastAuthMojangDown;
+				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangDown;
+				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftDown;
+				case MINECRAFTNET:     return config.broadcastMinecraftNetDown;
+				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftDown;
+				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftDown;
+			}
+		} else if(type == BroadcastType.STILLDOWN) {
+			switch (service) {
+				case ACCOUNTMOJANG:    return config.broadcastAccountMojangStillDown;
+				case AUTHMOJANG:       return config.broadcastAuthMojangStillDown;
+				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangStillDown;
+				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftStillDown;
+				case MINECRAFTNET:     return config.broadcastMinecraftNetStillDown;
+				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftStillDown;
+				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftStillDown;
+			}
 		}
 		
-		if(online && authserverMojangUnchangedTimer == config.broadcastUpWait) {
-			broadcast(config.broadcastAuthserverMojangUp); //service went up and waiting time elapsed
-			if(!sessionMinecraft && config.broadcastSessionStillDownOnLoginUp) broadcast(config.broadcastSessionMinecraftStillDown); //special broadcast when session servers are still down
-		}
-		else if(!online && authserverMojangUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastAuthserverMojangDown); //service went down and waiting time elapsed
-		authserverMojang = online; //set attribute to new status
-	}
-	
-	@EventHandler
-	public void onPing(ProxyPingEvent ev)
-	{
-		//store original MOTD
-		String motd = ev.getResponse().getDescription();
-		
-		if(!sessionMinecraft && !authserverMojang) { //session + login offline
-			motd = parseModt(config.sessionsAndLoginDown, motd);
-		} else if(!sessionMinecraft) { //only session offline
-			motd = parseModt(config.sessionsDown, motd);
-		} else if(!authserverMojang) { //only login offline
-			motd = parseModt(config.loginDown, motd);
-		}
-		
-		if(!skinsMinecraft && !minecraftNet) { //skins and minecraft.net offline
-			motd = parseModt(config.skinsAndMinecraftNetDown, motd);
-		} else if(!skinsMinecraft) { //only skins offline
-			motd = parseModt(config.skinsDown, motd);
-		} else if(!minecraftNet) { //only minecraft.net offline
-			motd = parseModt(config.minecraftNetDown, motd);
-		}
-		
-		if(motd != ev.getResponse().getDescription()) //MOTD was changed
-			ev.getResponse().setDescription(motd.replace("\\n", "\n"));
+		return "";
 	}
 	
 	/**
-	 * Parses an MOTD string
-	 * Replaces %motd% with the old MODT and translates color codes with &
-	 * @param s Original String
-	 * @param motd Old MOTD
-	 * @return Parsed string
+	 * Broadcasts the message for a service if specified for the type
+	 * @param service
+	 * @param type Which broadcast to show (server went up, down or is still down)
 	 */
-	public String parseModt(String s, String motd)
+	public void broadcast(Service service, BroadcastType type)
 	{
-		return ChatColor.translateAlternateColorCodes('&', s.replace("%motd%", motd));
+		setLastBroadcastedStatus(service, (type == BroadcastType.UP));
+		broadcast(getBroadcast(service, type));
 	}
 	
 	/**
@@ -317,4 +248,43 @@ public class MojangStatus extends Plugin implements Listener {
 	{
 		if(!s.isEmpty()) for(String m : ChatColor.translateAlternateColorCodes('&', s).split("\n")) BungeeCord.getInstance().broadcast(m);
 	}
+	
+	@EventHandler
+	public void onPing(ProxyPingEvent ev)
+	{
+		//store original MOTD
+		String motd = ev.getResponse().getDescription();
+		
+		if(!getStatus(Service.SESSIONMINECRAFT) && !getStatus(Service.AUTHSERVERMOJANG)) { //session + login offline
+			motd = parseModt(config.sessionsAndLoginDown, motd);
+		} else if(!getStatus(Service.SESSIONMINECRAFT)) { //only session offline
+			motd = parseModt(config.sessionsDown, motd);
+		} else if(!getStatus(Service.AUTHSERVERMOJANG)) { //only login offline
+			motd = parseModt(config.loginDown, motd);
+		}
+		
+		if(!getStatus(Service.SKINSMINECRAFT) && !getStatus(Service.MINECRAFTNET)) { //skins and minecraft.net offline
+			motd = parseModt(config.skinsAndMinecraftNetDown, motd);
+		} else if(!getStatus(Service.SKINSMINECRAFT)) { //only skins offline
+			motd = parseModt(config.skinsDown, motd);
+		} else if(!getStatus(Service.MINECRAFTNET)) { //only minecraft.net offline
+			motd = parseModt(config.minecraftNetDown, motd);
+		}
+		
+		if(motd != ev.getResponse().getDescription()) //MOTD was changed
+			ev.getResponse().setDescription(motd);
+	}
+	
+	/**
+	 * Parses an MOTD string
+	 * Replaces %motd% with the old MODT, translates color codes with & and converts \n into new lines
+	 * @param s Original String
+	 * @param motd Old MOTD
+	 * @return Parsed string
+	 */
+	public String parseModt(String s, String motd)
+	{
+		return ChatColor.translateAlternateColorCodes('&', s.replace("\\n", "\n").replace("%motd%", motd));
+	}
+
 }
