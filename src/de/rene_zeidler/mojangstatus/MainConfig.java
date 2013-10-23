@@ -22,17 +22,24 @@ public class MainConfig extends Config {
 	@Comment(value = "All strings use & as the color code character\n\nInterval in which the status is checked (in seconds)")
 	public int checkInterval = 30;
 	@Comment(value = "MOTD messages, shown when the corresponding services are down. %motd% gets replaced with the standard MOTD\nSession servers are down, probably cannot join")
-	public String sessionsDown = "&4Session-Server&c down -- leider möglicherweise &4kein Joinen&c möglich!";
+	public String sessionsDown = "&4Session-Server&c down\nleider möglicherweise &4kein Joinen&c möglich!";
 	@Comment(value = "Session and login servers are down, probably cannot join or log in after restarting game")
-	public String sessionsAndLoginDown = "&4Session- und Login-Server&c down -- leider möglicherweise &4kein Joinen&c möglich!";
+	public String sessionsAndLoginDown = "&4Session- und Login-Server&c down\nleider möglicherweise &4kein Joinen&c möglich!";
 	@Comment(value = "Login servers are down, can join but cannot log back in after restarting Minecraft")
-	public String loginDown = "&4Login-Server&c down &r-- %motd%";
+	public String loginDown = "&4Login-Server&c down&r\n%motd%";
 	@Comment(value = "The following messages are added additionally to the top ones. If you don't include %motd% they may overwrite the more important messages.\nSkin servers are down, skins may not be displayed correctly")
 	public String skinsDown = "%motd%&c (&4Skin-Server&c down)";
 	@Comment(value = "Minecraft.net is down, e.g. cannot access profile to change skin")
 	public String minecraftNetDown = "%motd%&c (&4minecraft.net&c down)";
 	@Comment(value = "Skin servers and minecraft.net are down")
 	public String skinsAndMinecraftNetDown = "%motd%&c (&4Skin-Server und minecraft.net&c down)";
+	@Comment(value = "Same as above but values are paths to an image file that replaces the server icon (top 3 icons overwrite bottom 3 icons)")
+	public String iconSessionsDown = "server-icon-sessionsDown.png";
+	public String iconSessionsAndLoginDown = "server-icon-sessionsAndLoginDown.png";
+	public String iconLoginDown = "server-icon-loginDown.png";
+	public String iconSkinsDown = "server-icon-skinsDown.png";
+	public String iconMinecraftNetDown = "server-icon-minecraftNetDown.png";
+	public String iconSkinsAndMinecraftNetDown = "server-icon-skinsAndMinecraftNetDown.png";
 	
 	@Comment(value = "\n\nOutput of the /mojangstatus command, %status% in status messages gets replaced with the color coded status of the service\nLine at the beginning of the output")
 	public String commandCheckHeader = "&9Status der wichtigen Mojang-Dienste:";

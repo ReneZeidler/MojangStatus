@@ -1,8 +1,13 @@
 package de.rene_zeidler.mojangstatus;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import com.google.common.io.BaseEncoding;
+import com.google.common.io.Files;
 
 import net.craftminecraft.bungee.bungeeyaml.bukkitapi.InvalidConfigurationException;
 import net.md_5.bungee.BungeeCord;
@@ -44,6 +49,13 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	private EnumMap<Service, Integer> timerUnchanged = new EnumMap<Service, Integer>(Service.class);
 
+	//Stores the icons that are displayed when the corresponding services are down, empty when the icon shouldn't change
+	private String iconSessionsDown = "";
+	private String iconSessionsAndLoginDown = "";
+	private String iconLoginDown = "";
+	private String iconSkinsDown = "";
+	private String iconMinecraftNetDown = "";
+	private String iconSkinsAndMinecraftNetDown = "";
 	
 	/**
 	 * Static instance of the plugin itself
@@ -81,6 +93,8 @@ public class MojangStatus extends Plugin implements Listener {
 		BungeeCord.getInstance().getPluginManager().registerCommand(this, new CommandMCStatus());
 		BungeeCord.getInstance().getPluginManager().registerCommand(this, new CommandSetStatus());
 		
+		this.preloadImages();
+		
 		//schedule task
 		task = BungeeCord.getInstance().getScheduler().schedule(this, new StatusChecker(), 0, config.checkInterval, TimeUnit.SECONDS);
 		getLogger().log(Level.INFO, "Initialized Scheduler with an interval of " + config.checkInterval + " seconds");
@@ -100,6 +114,34 @@ public class MojangStatus extends Plugin implements Listener {
 		
 		//cancel task
 		task.cancel();
+	}
+	
+	private void preloadImages()
+	{
+		iconSessionsAndLoginDown     = loadImage(config.iconSessionsAndLoginDown);
+		iconSessionsDown             = loadImage(config.iconSessionsDown);
+		iconLoginDown                = loadImage(config.iconLoginDown);
+		iconSkinsAndMinecraftNetDown = loadImage(config.iconSkinsAndMinecraftNetDown);
+		iconSkinsDown                = loadImage(config.iconSkinsDown);
+		iconMinecraftNetDown         = loadImage(config.iconMinecraftNetDown);
+	}
+	
+	private String loadImage(String path)
+	{
+		File f = new File(path);
+		if(f.exists())
+		{
+			try {
+				String icon = "data:image/png;base64," + BaseEncoding.base64().encode(Files.toByteArray(f));
+				if(config.debug) getLogger().log(Level.INFO, "Image file \"" + path + "\" was loaded successfully");
+				return icon;
+			} catch (IOException e) {
+				getLogger().log(Level.WARNING, "Could not load image \"" + path + "\": " + e.getMessage());
+			}
+		} else {
+			getLogger().log(Level.WARNING, "Image file \"" + path + "\" doesn't exist");
+		}
+		return "";
 	}
 	
 	/**
@@ -254,25 +296,34 @@ public class MojangStatus extends Plugin implements Listener {
 	{
 		//store original MOTD
 		String motd = ev.getResponse().getDescription();
+		String icon = "";
 		
 		if(!getStatus(Service.SESSIONMINECRAFT) && !getStatus(Service.AUTHSERVERMOJANG)) { //session + login offline
 			motd = parseModt(config.sessionsAndLoginDown, motd);
+			icon = iconSessionsAndLoginDown;
 		} else if(!getStatus(Service.SESSIONMINECRAFT)) { //only session offline
 			motd = parseModt(config.sessionsDown, motd);
+			icon = iconSessionsDown;
 		} else if(!getStatus(Service.AUTHSERVERMOJANG)) { //only login offline
 			motd = parseModt(config.loginDown, motd);
+			icon = iconLoginDown;
 		}
 		
 		if(!getStatus(Service.SKINSMINECRAFT) && !getStatus(Service.MINECRAFTNET)) { //skins and minecraft.net offline
 			motd = parseModt(config.skinsAndMinecraftNetDown, motd);
+			if(icon == "") icon = iconSkinsAndMinecraftNetDown;
 		} else if(!getStatus(Service.SKINSMINECRAFT)) { //only skins offline
 			motd = parseModt(config.skinsDown, motd);
+			if(icon == "") icon = iconSkinsDown;
 		} else if(!getStatus(Service.MINECRAFTNET)) { //only minecraft.net offline
 			motd = parseModt(config.minecraftNetDown, motd);
+			if(icon == "") icon = iconMinecraftNetDown;
 		}
 		
 		if(motd != ev.getResponse().getDescription()) //MOTD was changed
 			ev.getResponse().setDescription(motd);
+		if(icon != "") //Servericon was changed
+			ev.getResponse().setFavicon(icon);
 	}
 	
 	/**
