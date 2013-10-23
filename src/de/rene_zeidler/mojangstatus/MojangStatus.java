@@ -6,7 +6,6 @@ import java.util.logging.Level;
 import net.craftminecraft.bungee.bungeeyaml.bukkitapi.InvalidConfigurationException;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -43,14 +42,23 @@ public class MojangStatus extends Plugin implements Listener {
 	 */
 	public static boolean authserverMojang = true;
 	
+	//The last status that has been broadcasted
+	public static boolean minecraftNetBroadcasted = true;
+	public static boolean loginMinecraftBroadcasted = true;
+	public static boolean sessionMinecraftBroadcasted = true;
+	public static boolean accountMojangBroadcasted = true;
+	public static boolean authMojangBroadcasted = true;
+	public static boolean skinsMinecraftBroadcasted = true;
+	public static boolean authserverMojangBroadcasted = true;
+	
 	//How long (in number of checks) the status of the server hasn't changed
-	public int minecraftNetUnchangedTimer;
-	public int loginMinecraftUnchangedTimer;
-	public int sessionMinecraftUnchangedTimer;
-	public int accountMojangUnchangedTimer;
-	public int authMojangUnchangedTimer;
-	public int skinsMinecraftUnchangedTimer;
-	public int authserverMojangUnchangedTimer;
+	public int minecraftNetUnchangedTimer = 0;
+	public int loginMinecraftUnchangedTimer = 0;
+	public int sessionMinecraftUnchangedTimer = 0;
+	public int accountMojangUnchangedTimer = 0;
+	public int authMojangUnchangedTimer = 0;
+	public int skinsMinecraftUnchangedTimer = 0;
+	public int authserverMojangUnchangedTimer = 0;
 	
 	/**
 	 * Static instance of the plugin itself
@@ -83,15 +91,6 @@ public class MojangStatus extends Plugin implements Listener {
 	{
 		this.config = new MainConfig(this);
 		
-		//set initial value of unchanged timers to config.broadcastUpWait to avoid a broadcast on startup
-		minecraftNetUnchangedTimer = config.broadcastUpWait;
-		loginMinecraftUnchangedTimer = config.broadcastUpWait;
-		sessionMinecraftUnchangedTimer = config.broadcastUpWait;
-		accountMojangUnchangedTimer = config.broadcastUpWait;
-		authMojangUnchangedTimer = config.broadcastUpWait;
-		skinsMinecraftUnchangedTimer = config.broadcastUpWait;
-		authserverMojangUnchangedTimer = config.broadcastUpWait;
-		
 		//register Listener/Commands
 		BungeeCord.getInstance().getPluginManager().registerListener(this, this);
 		BungeeCord.getInstance().getPluginManager().registerCommand(this, new CommandMCStatus());
@@ -110,7 +109,7 @@ public class MojangStatus extends Plugin implements Listener {
 		try {
 			this.config.save();
 		} catch (InvalidConfigurationException e) {
-			getLogger().log(Level.SEVERE, "Error while saving the config:");
+			getLogger().log(Level.WARNING, "Error while saving the config:");
 			e.printStackTrace();
 		}
 		
@@ -134,8 +133,8 @@ public class MojangStatus extends Plugin implements Listener {
 			if(!online && minecraftNetUnchangedTimer % config.remainsDownInterval == 0) broadcast(config.broadcastMinecraftNetStillDown); //service still down and interval elapsed
 		}
 		
-		if(online && minecraftNetUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastMinecraftNetUp); //service went up and waiting time elapsed
-		else if(!online && minecraftNetUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastMinecraftNetDown); //service went down and waiting time elapsed
+		if(online && !minecraftNetBroadcasted && minecraftNetUnchangedTimer == config.broadcastUpWait) broadcast(config.broadcastMinecraftNetUp); //service went up and waiting time elapsed
+		else if(!online && minecraftNetBroadcasted && minecraftNetUnchangedTimer == config.broadcastDownWait) broadcast(config.broadcastMinecraftNetDown); //service went down and waiting time elapsed
 		minecraftNet = online; //set attribute to new status
 	}
 	
@@ -275,34 +274,26 @@ public class MojangStatus extends Plugin implements Listener {
 	public void onPing(ProxyPingEvent ev)
 	{
 		//store original MOTD
-		String modt = ev.getResponse().getMotd();
+		String motd = ev.getResponse().getDescription();
 		
 		if(!sessionMinecraft && !authserverMojang) { //session + login offline
-			modt = parseModt(config.sessionsAndLoginDown, modt);
+			motd = parseModt(config.sessionsAndLoginDown, motd);
 		} else if(!sessionMinecraft) { //only session offline
-			modt = parseModt(config.sessionsDown, modt);
+			motd = parseModt(config.sessionsDown, motd);
 		} else if(!authserverMojang) { //only login offline
-			modt = parseModt(config.loginDown, modt);
+			motd = parseModt(config.loginDown, motd);
 		}
 		
 		if(!skinsMinecraft && !minecraftNet) { //skins and minecraft.net offline
-			modt = parseModt(config.skinsAndMinecraftNetDown, modt);
+			motd = parseModt(config.skinsAndMinecraftNetDown, motd);
 		} else if(!skinsMinecraft) { //only skins offline
-			modt = parseModt(config.skinsDown, modt);
+			motd = parseModt(config.skinsDown, motd);
 		} else if(!minecraftNet) { //only minecraft.net offline
-			modt = parseModt(config.minecraftNetDown, modt);
+			motd = parseModt(config.minecraftNetDown, motd);
 		}
 		
-		if(modt != ev.getResponse().getMotd()) { //MOTD was changed
-			//create new ServerPing with changed MOTD
-			ServerPing sp = new ServerPing(
-					ev.getResponse().getProtocolVersion(),
-					ev.getResponse().getGameVersion(),
-					modt,
-					ev.getResponse().getCurrentPlayers(),
-					ev.getResponse().getMaxPlayers());
-			ev.setResponse(sp); //replace ServerPing in the event
-		}
+		if(motd != ev.getResponse().getDescription()) //MOTD was changed
+			ev.getResponse().setDescription(motd.replace("\\n", "\n"));
 	}
 	
 	/**
