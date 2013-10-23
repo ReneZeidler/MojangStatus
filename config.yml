@@ -1,8 +1,4 @@
-# 
-# All strings use & as the color code character
-# 
-# Interval in which the status is checked (in seconds)
-
+# Debugging enables more output in the console
 debug: false
 # All strings use & as the color code character
 # 
@@ -10,12 +6,17 @@ debug: false
 checkInterval: 30
 # MOTD messages, shown when the corresponding services are down. %motd% gets replaced with the standard MOTD
 # Session servers are down, probably cannot join
-sessionsDown: '&4Session-Server&c down -- leider möglicherweise &4kein Joinen&c möglich!'
+sessionsDown: |-
+  &4Session-Server&c down
+  leider möglicherweise &4kein Joinen&c möglich!
 # Session and login servers are down, probably cannot join or log in after restarting game
-sessionsAndLoginDown: '&4Session- und Login-Server&c down -- leider möglicherweise
-  &4kein Joinen&c möglich!'
+sessionsAndLoginDown: |-
+  &4Session- und Login-Server&c down
+  leider möglicherweise &4kein Joinen&c möglich!
 # Login servers are down, can join but cannot log back in after restarting Minecraft
-loginDown: '&4Login-Server&c down &r-- %motd%'
+loginDown: |-
+  &4Login-Server&c down&r
+  %motd%
 # The following messages are added additionally to the top ones. If you don't include %motd% they may overwrite the more important messages.
 # Skin servers are down, skins may not be displayed correctly
 skinsDown: '%motd%&c (&4Skin-Server&c down)'
@@ -23,6 +24,13 @@ skinsDown: '%motd%&c (&4Skin-Server&c down)'
 minecraftNetDown: '%motd%&c (&4minecraft.net&c down)'
 # Skin servers and minecraft.net are down
 skinsAndMinecraftNetDown: '%motd%&c (&4Skin-Server und minecraft.net&c down)'
+# Same as above but values are paths to an image file that replaces the server icon (top 3 icons overwrite bottom 3 icons)
+iconSessionsDown: server-icon-sessionsDown.png
+iconSessionsAndLoginDown: server-icon-sessionsAndLoginDown.png
+iconLoginDown: server-icon-loginDown.png
+iconSkinsDown: server-icon-skinsDown.png
+iconMinecraftNetDown: server-icon-minecraftNetDown.png
+iconSkinsAndMinecraftNetDown: server-icon-skinsAndMinecraftNetDown.png
 # 
 # 
 # Output of the /mojangstatus command, %status% in status messages gets replaced with the color coded status of the service
@@ -57,6 +65,8 @@ commandCheckStatusLoginMinecraft: '&fDie alten &eLogin-Server&f sind gerade %sta
 # Public broadcasts when a service goes up or down. Use 
 #  for multiple lines. Leave empty to disable.
 # Service went down
+# After how many checks the broadcast should be displayed when a service goes down (0 = instantly, 2 = after the second check)? Avoids spamming the chat when the servers are just down for a short time
+broadcastDownWait: 2
 broadcastMinecraftNetDown: ''
 broadcastAuthserverMojangDown: |-
   &cDie &lLogin-Server&c sind soeben &4offline&c gegangen.
@@ -69,6 +79,8 @@ broadcastAuthMojangDown: ''
 broadcastAccountMojangDown: ''
 broadcastLoginMinecraftDown: ''
 # Service goes up
+# After how many checks the broadcast should be displayed when a service goes up?
+broadcastUpWait: 1
 broadcastMinecraftNetUp: ''
 # Show broadcast that login servers are still down when session servers go up to avoid confusion
 broadcastLoginStillDownOnSessionUp: true
