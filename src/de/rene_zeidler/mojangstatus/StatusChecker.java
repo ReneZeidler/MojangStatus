@@ -47,16 +47,17 @@ public class StatusChecker implements Runnable {
 		}
 		try {
 			//Expected format is:
-			//	[{"minecraft.net":"green"},{"login.minecraft.net":"green"},{"session.minecraft.net":"green"},{"account.mojang.com":"green"},{"auth.mojang.com":"green"},{"skins.minecraft.net":"green"},{"authserver.mojang.com":"green"}]
+			//[{"minecraft.net":"green"},{"login.minecraft.net":"green"},{"session.minecraft.net":"green"},{"account.mojang.com":"green"},{"auth.mojang.com":"green"},{"skins.minecraft.net":"green"},{"authserver.mojang.com":"green"},{"sessionserver.mojang.com":"green"}]
 			//Sets the service status to offline when the corresponding jsonObject has the value "red"
-			ms.setStatus(Service.MINECRAFTNET,     !((String) ((HashMap) this.jsonObject.get(0)).get("minecraft.net")).        equalsIgnoreCase("red"));
-			ms.setStatus(Service.LOGINMINECRAFT,   !((String) ((HashMap) this.jsonObject.get(1)).get("login.minecraft.net")).  equalsIgnoreCase("red"));
-			ms.setStatus(Service.SESSIONMINECRAFT, !((String) ((HashMap) this.jsonObject.get(2)).get("session.minecraft.net")).equalsIgnoreCase("red"));
-			ms.setStatus(Service.ACCOUNTMOJANG,    !((String) ((HashMap) this.jsonObject.get(3)).get("account.mojang.com")).   equalsIgnoreCase("red"));
-			ms.setStatus(Service.AUTHMOJANG,       !((String) ((HashMap) this.jsonObject.get(4)).get("auth.mojang.com")).      equalsIgnoreCase("red"));
-			ms.setStatus(Service.SKINSMINECRAFT,   !((String) ((HashMap) this.jsonObject.get(5)).get("skins.minecraft.net")).  equalsIgnoreCase("red"));
-			ms.setStatus(Service.AUTHSERVERMOJANG, !((String) ((HashMap) this.jsonObject.get(6)).get("authserver.mojang.com")).equalsIgnoreCase("red"));
-		} catch (NullPointerException ex) {
+			ms.setStatus(Service.MINECRAFTNET,        !((String) ((HashMap) this.jsonObject.get(0)).get("minecraft.net")).           equalsIgnoreCase("red"));
+			ms.setStatus(Service.LOGINMINECRAFT,      !((String) ((HashMap) this.jsonObject.get(1)).get("login.minecraft.net")).     equalsIgnoreCase("red"));
+			ms.setStatus(Service.SESSIONMINECRAFT,    !((String) ((HashMap) this.jsonObject.get(2)).get("session.minecraft.net")).   equalsIgnoreCase("red"));
+			ms.setStatus(Service.ACCOUNTMOJANG,       !((String) ((HashMap) this.jsonObject.get(3)).get("account.mojang.com")).      equalsIgnoreCase("red"));
+			ms.setStatus(Service.AUTHMOJANG,          !((String) ((HashMap) this.jsonObject.get(4)).get("auth.mojang.com")).         equalsIgnoreCase("red"));
+			ms.setStatus(Service.SKINSMINECRAFT,      !((String) ((HashMap) this.jsonObject.get(5)).get("skins.minecraft.net")).     equalsIgnoreCase("red"));
+			ms.setStatus(Service.AUTHSERVERMOJANG,    !((String) ((HashMap) this.jsonObject.get(6)).get("authserver.mojang.com")).   equalsIgnoreCase("red"));
+			ms.setStatus(Service.SESSIONSERVERMOJANG, !((String) ((HashMap) this.jsonObject.get(7)).get("sessionserver.mojang.com")).equalsIgnoreCase("red"));
+		} catch (Exception ex) {
 			//JSON data have an unexpected format, just ignore it
 			ms.getLogger().log(Level.FINE, "The downloaded JSON data are invalid or empty");
 			if(config.debug) ex.printStackTrace();

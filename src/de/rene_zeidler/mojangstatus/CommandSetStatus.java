@@ -32,13 +32,14 @@ public class CommandSetStatus extends Command {
 		}
 		
 		//Parse the first argument and set the status of the service
-		     if(args[0].equalsIgnoreCase("minecraftNet")     || args[0].equalsIgnoreCase("website")     || args[0].equalsIgnoreCase("minecraft.net"))         ms.setStatus(Service.MINECRAFTNET,     online);
-		else if(args[0].equalsIgnoreCase("authServerMojang") || args[0].equalsIgnoreCase("login")       || args[0].equalsIgnoreCase("authserver.mojang.com")) ms.setStatus(Service.AUTHSERVERMOJANG, online);
-		else if(args[0].equalsIgnoreCase("sessionMinecraft") || args[0].equalsIgnoreCase("session")     || args[0].equalsIgnoreCase("session.minecraft.net")) ms.setStatus(Service.SESSIONMINECRAFT, online);
-		else if(args[0].equalsIgnoreCase("skinsMinecraft")   || args[0].equalsIgnoreCase("skins")       || args[0].equalsIgnoreCase("skins.minecraft.net"))   ms.setStatus(Service.SKINSMINECRAFT,   online);
-		else if(args[0].equalsIgnoreCase("authMojang")       || args[0].equalsIgnoreCase("auth")        || args[0].equalsIgnoreCase("auth.mojang.com"))       ms.setStatus(Service.AUTHMOJANG,       online);
-		else if(args[0].equalsIgnoreCase("accountMojang")    || args[0].equalsIgnoreCase("account")     || args[0].equalsIgnoreCase("account.mojang.com"))    ms.setStatus(Service.ACCOUNTMOJANG,    online);
-		else if(args[0].equalsIgnoreCase("loginMinecraft")   || args[0].equalsIgnoreCase("legacylogin") || args[0].equalsIgnoreCase("login.minecraft.net"))   ms.setStatus(Service.LOGINMINECRAFT,   online);
+		     if(args[0].equalsIgnoreCase("minecraftNet")        || args[0].equalsIgnoreCase("website")       || args[0].equalsIgnoreCase("minecraft.net"))            ms.setStatus(Service.MINECRAFTNET,        online);
+		else if(args[0].equalsIgnoreCase("authServerMojang")    || args[0].equalsIgnoreCase("login")         || args[0].equalsIgnoreCase("authserver.mojang.com"))    ms.setStatus(Service.AUTHSERVERMOJANG,    online);
+		else if(args[0].equalsIgnoreCase("sessionServerMojang") || args[0].equalsIgnoreCase("session")       || args[0].equalsIgnoreCase("sessionserver.mojang.com")) ms.setStatus(Service.SESSIONSERVERMOJANG, online);
+		else if(args[0].equalsIgnoreCase("sessionMinecraft")    || args[0].equalsIgnoreCase("legacysession") || args[0].equalsIgnoreCase("session.minecraft.net"))    ms.setStatus(Service.SESSIONMINECRAFT,    online);
+		else if(args[0].equalsIgnoreCase("skinsMinecraft")      || args[0].equalsIgnoreCase("skins")         || args[0].equalsIgnoreCase("skins.minecraft.net"))      ms.setStatus(Service.SKINSMINECRAFT,      online);
+		else if(args[0].equalsIgnoreCase("authMojang")          || args[0].equalsIgnoreCase("auth")          || args[0].equalsIgnoreCase("auth.mojang.com"))          ms.setStatus(Service.AUTHMOJANG,          online);
+		else if(args[0].equalsIgnoreCase("accountMojang")       || args[0].equalsIgnoreCase("account")       || args[0].equalsIgnoreCase("account.mojang.com"))       ms.setStatus(Service.ACCOUNTMOJANG,       online);
+		else if(args[0].equalsIgnoreCase("loginMinecraft")      || args[0].equalsIgnoreCase("legacylogin")   || args[0].equalsIgnoreCase("login.minecraft.net"))      ms.setStatus(Service.LOGINMINECRAFT,      online);
 		else {
 			sender.sendMessage(ChatColor.RED  + "Unknown server, please use the server address or the service name");
 			return;

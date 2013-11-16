@@ -21,13 +21,38 @@ import net.md_5.bungee.event.EventHandler;
 public class MojangStatus extends Plugin implements Listener {
 	
 	public static enum Service {
+		/**
+		 * minecraft.net website
+		 */
 		MINECRAFTNET,
+		/**
+		 * Legacy Login Server (old Launcher)
+		 */
 		LOGINMINECRAFT,
+		/**
+		 * Legacy Session Server (until 1.6)
+		 */
 		SESSIONMINECRAFT,
+		/**
+		 * New Mojang Account Server
+		 */
 		ACCOUNTMOJANG,
+		/**
+		 * Legacy Mojang Account Server
+		 */
 		AUTHMOJANG,
+		/**
+		 * New Skin Server (since 1.3)
+		 */
 		SKINSMINECRAFT,
-		AUTHSERVERMOJANG
+		/**
+		 * New Authentication Server (new Launcher)
+		 */
+		AUTHSERVERMOJANG,
+		/**
+		 * New Session Server (since 1.7)
+		 */
+		SESSIONSERVERMOJANG
 	}
 	
 	public static enum BroadcastType {
@@ -219,8 +244,8 @@ public class MojangStatus extends Plugin implements Listener {
 		if( newStatus && !getLastBroadcastedStatus(service) && getUnchangedTime(service) == config.broadcastUpWait  ) {
 			broadcast(service, BroadcastType.UP  );
 			//Special broadcast when only one of the services for login + session goes up but the other is down
-			if(service == Service.AUTHSERVERMOJANG && !getStatus(Service.SESSIONMINECRAFT)) broadcast(Service.SESSIONMINECRAFT, BroadcastType.STILLDOWN);
-			if(service == Service.SESSIONMINECRAFT && !getStatus(Service.AUTHSERVERMOJANG)) broadcast(Service.AUTHSERVERMOJANG, BroadcastType.STILLDOWN);
+			if(service == Service.AUTHSERVERMOJANG    && !getStatus(Service.SESSIONSERVERMOJANG)) broadcast(Service.SESSIONSERVERMOJANG, BroadcastType.STILLDOWN);
+			if(service == Service.SESSIONSERVERMOJANG && !getStatus(Service.AUTHSERVERMOJANG   )) broadcast(Service.AUTHSERVERMOJANG,    BroadcastType.STILLDOWN);
 		}
 		// is offline &&  wasn't broadcasted before         && buffer time has elapsed
 		if(!newStatus &&  getLastBroadcastedStatus(service) && getUnchangedTime(service) == config.broadcastDownWait)
@@ -237,33 +262,36 @@ public class MojangStatus extends Plugin implements Listener {
 	{
 		if(type == BroadcastType.UP) {
 			switch (service) {
-				case ACCOUNTMOJANG:    return config.broadcastAccountMojangUp;
-				case AUTHMOJANG:       return config.broadcastAuthMojangUp;
-				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangUp;
-				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftUp;
-				case MINECRAFTNET:     return config.broadcastMinecraftNetUp;
-				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftUp;
-				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftUp;
+				case ACCOUNTMOJANG:       return config.broadcastAccountMojangUp;
+				case AUTHMOJANG:          return config.broadcastAuthMojangUp;
+				case AUTHSERVERMOJANG:    return config.broadcastAuthserverMojangUp;
+				case LOGINMINECRAFT:      return config.broadcastLoginMinecraftUp;
+				case MINECRAFTNET:        return config.broadcastMinecraftNetUp;
+				case SESSIONMINECRAFT:    return config.broadcastSessionMinecraftUp;
+				case SKINSMINECRAFT:      return config.broadcastSkinsMinecraftUp;
+				case SESSIONSERVERMOJANG: return config.broadcastSessionserverMojangUp;
 			}
 		} else if(type == BroadcastType.DOWN) {
 			switch (service) {
-				case ACCOUNTMOJANG:    return config.broadcastAccountMojangDown;
-				case AUTHMOJANG:       return config.broadcastAuthMojangDown;
-				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangDown;
-				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftDown;
-				case MINECRAFTNET:     return config.broadcastMinecraftNetDown;
-				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftDown;
-				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftDown;
+				case ACCOUNTMOJANG:       return config.broadcastAccountMojangDown;
+				case AUTHMOJANG:          return config.broadcastAuthMojangDown;
+				case AUTHSERVERMOJANG:    return config.broadcastAuthserverMojangDown;
+				case LOGINMINECRAFT:      return config.broadcastLoginMinecraftDown;
+				case MINECRAFTNET:        return config.broadcastMinecraftNetDown;
+				case SESSIONMINECRAFT:    return config.broadcastSessionMinecraftDown;
+				case SKINSMINECRAFT:      return config.broadcastSkinsMinecraftDown;
+				case SESSIONSERVERMOJANG: return config.broadcastSessionserverMojangDown;
 			}
 		} else if(type == BroadcastType.STILLDOWN) {
 			switch (service) {
-				case ACCOUNTMOJANG:    return config.broadcastAccountMojangStillDown;
-				case AUTHMOJANG:       return config.broadcastAuthMojangStillDown;
-				case AUTHSERVERMOJANG: return config.broadcastAuthserverMojangStillDown;
-				case LOGINMINECRAFT:   return config.broadcastLoginMinecraftStillDown;
-				case MINECRAFTNET:     return config.broadcastMinecraftNetStillDown;
-				case SESSIONMINECRAFT: return config.broadcastSessionMinecraftStillDown;
-				case SKINSMINECRAFT:   return config.broadcastSkinsMinecraftStillDown;
+				case ACCOUNTMOJANG:       return config.broadcastAccountMojangStillDown;
+				case AUTHMOJANG:          return config.broadcastAuthMojangStillDown;
+				case AUTHSERVERMOJANG:    return config.broadcastAuthserverMojangStillDown;
+				case LOGINMINECRAFT:      return config.broadcastLoginMinecraftStillDown;
+				case MINECRAFTNET:        return config.broadcastMinecraftNetStillDown;
+				case SESSIONMINECRAFT:    return config.broadcastSessionMinecraftStillDown;
+				case SKINSMINECRAFT:      return config.broadcastSkinsMinecraftStillDown;
+				case SESSIONSERVERMOJANG: return config.broadcastSessionserverMojangStillDown;
 			}
 		}
 		
@@ -298,10 +326,10 @@ public class MojangStatus extends Plugin implements Listener {
 		String motd = ev.getResponse().getDescription();
 		String icon = "";
 		
-		if(!getStatus(Service.SESSIONMINECRAFT) && !getStatus(Service.AUTHSERVERMOJANG)) { //session + login offline
+		if(!getStatus(Service.SESSIONSERVERMOJANG) && !getStatus(Service.AUTHSERVERMOJANG)) { //session + login offline
 			motd = parseModt(config.sessionsAndLoginDown, motd);
 			icon = iconSessionsAndLoginDown;
-		} else if(!getStatus(Service.SESSIONMINECRAFT)) { //only session offline
+		} else if(!getStatus(Service.SESSIONSERVERMOJANG)) { //only session offline
 			motd = parseModt(config.sessionsDown, motd);
 			icon = iconSessionsDown;
 		} else if(!getStatus(Service.AUTHSERVERMOJANG)) { //only login offline

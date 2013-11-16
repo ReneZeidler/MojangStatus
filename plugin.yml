@@ -1,5 +1,5 @@
 name: MojangStatus
-version: 1.3.0
+version: 1.3.1
 author: Rene Zeidler
 main: de.rene_zeidler.mojangstatus.MojangStatus
 depends: ['BungeeYAML']

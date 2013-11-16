@@ -1,4 +1,6 @@
 # Debugging enables more output in the console
+
+# Debugging enables more output in the console
 debug: false
 # All strings use & as the color code character
 # 
@@ -41,7 +43,7 @@ commandCheckStatusMinecraftNet: '&eDie Website &6minecraft.net&e ist gerade %sta
 # Status of the login servers (Yggdrasil)
 commandCheckStatusAuthserverMojang: '&eDie &6Login-Server&e sind gerade %status%'
 # Status of the session servers
-commandCheckStatusSessionMinecraft: '&eDie &6Session-Server&e sind gerade %status%'
+commandCheckStatusSessionserverMojang: '&eDie &6Session-Server&e sind gerade %status%'
 # Status of the skin servers
 commandCheckStatusSkinsMinecraft: '&eDie &6Skin-Server&e sind gerade %status%'
 # Warning when session servers are offline (no players can join)
@@ -60,6 +62,8 @@ commandCheckStatusAuthMojang: '&fDie alten Mojang-Account &eLogin-Server&f sind 
 commandCheckStatusAccountMojang: '&fDie &eMojang-Account&f Website ist gerade %status%'
 # Status of the legacy login servers
 commandCheckStatusLoginMinecraft: '&fDie alten &eLogin-Server&f sind gerade %status%'
+# Status of the legacy session servers
+commandCheckStatusSessionMinecraft: '&eDie alten &6Session-Server&e sind gerade %status%'
 # 
 # 
 # Public broadcasts when a service goes up or down. Use 
@@ -71,9 +75,10 @@ broadcastMinecraftNetDown: ''
 broadcastAuthserverMojangDown: |-
   &cDie &lLogin-Server&c sind soeben &4offline&c gegangen.
   &cEs können sich vermutlich keine weiteren Spieler mehr in Minecraft einloggen!
-broadcastSessionMinecraftDown: |-
+broadcastSessionserverMojangDown: |-
   &cDie &lSession-Server&c sind soeben &4offline&c gegangen.
   &cEs können vermutlich keine weiteren Spieler mehr joinen!
+broadcastSessionMinecraftDown: ''
 broadcastSkinsMinecraftDown: ''
 broadcastAuthMojangDown: ''
 broadcastAccountMojangDown: ''
@@ -87,9 +92,10 @@ broadcastLoginStillDownOnSessionUp: true
 broadcastAuthserverMojangUp: '&aDie &lLogin-Server&a sind soeben &2online&a gegangen.'
 # Show broadcast that session servers are still down when login servers go up to avoid confusion
 broadcastSessionStillDownOnLoginUp: true
-broadcastSessionMinecraftUp: |-
+broadcastSessionserverMojangUp: |-
   &aDie &lSession-Server&a sind soeben &2online&a gegangen.
   &aEs können wieder weitere Spieler joinen!
+broadcastSessionMinecraftUp: ''
 broadcastSkinsMinecraftUp: ''
 broadcastAuthMojangUp: ''
 broadcastAccountMojangUp: ''
@@ -100,8 +106,9 @@ remainsDownInterval: 20
 broadcastMinecraftNetStillDown: ''
 broadcastAuthserverMojangStillDown: '&cDie &lLogin-Server&c sind immer noch &4offline&c,
   es können sich keine weiteren Spieler in Minecraft einloggen!'
-broadcastSessionMinecraftStillDown: '&cDie &lSession-Server&c sind immer noch &4offline&c
+broadcastSessionserverMojangStillDown: '&cDie &lSession-Server&c sind immer noch &4offline&c
   und es können keine weiteren Spieler joinen!'
+broadcastSessionMinecraftStillDown: ''
 broadcastSkinsMinecraftStillDown: ''
 broadcastAuthMojangStillDown: ''
 broadcastAccountMojangStillDown: ''

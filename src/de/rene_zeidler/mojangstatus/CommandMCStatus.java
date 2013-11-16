@@ -41,10 +41,10 @@ public class CommandMCStatus extends Command {
 		
 		//Just parse the messages from the config and send it one after another
 		sender.sendMessage(parseMessage(config.commandCheckHeader));
-		sender.sendMessage(parseMessage(config.commandCheckStatusMinecraftNet,     ms.getStatus(Service.MINECRAFTNET),     false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusAuthserverMojang, ms.getStatus(Service.AUTHSERVERMOJANG), false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusSessionMinecraft, ms.getStatus(Service.SESSIONMINECRAFT), false));
-		sender.sendMessage(parseMessage(config.commandCheckStatusSkinsMinecraft,   ms.getStatus(Service.SKINSMINECRAFT),   false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusMinecraftNet,        ms.getStatus(Service.MINECRAFTNET),        false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusAuthserverMojang,    ms.getStatus(Service.AUTHSERVERMOJANG),    false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusSessionserverMojang, ms.getStatus(Service.SESSIONSERVERMOJANG), false));
+		sender.sendMessage(parseMessage(config.commandCheckStatusSkinsMinecraft,      ms.getStatus(Service.SKINSMINECRAFT),      false));
 		if(!ms.getStatus(Service.SESSIONMINECRAFT))      sender.sendMessage(parseMessage(config.commandCheckWarningSessionOffline)); //Warning when session servers are offline
 		else if(!ms.getStatus(Service.AUTHSERVERMOJANG)) sender.sendMessage(parseMessage(config.commandCheckWarningLoginOffline));   //Warning when login servers are offline
 		if(!ms.getStatus(Service.SKINSMINECRAFT))        sender.sendMessage(parseMessage(config.commandCheckWarningSkinsOffline));   //Warning when skin servers are offline
@@ -52,6 +52,7 @@ public class CommandMCStatus extends Command {
 		sender.sendMessage(parseMessage(config.commandCheckStatusAuthMojang,       ms.getStatus(Service.AUTHMOJANG),       true));
 		sender.sendMessage(parseMessage(config.commandCheckStatusAccountMojang,    ms.getStatus(Service.ACCOUNTMOJANG),    true));
 		sender.sendMessage(parseMessage(config.commandCheckStatusLoginMinecraft,   ms.getStatus(Service.LOGINMINECRAFT),   true));
+		sender.sendMessage(parseMessage(config.commandCheckStatusSessionMinecraft, ms.getStatus(Service.SESSIONMINECRAFT), true));
 	}
 	
 	/**

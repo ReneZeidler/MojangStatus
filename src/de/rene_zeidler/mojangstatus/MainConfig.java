@@ -48,7 +48,7 @@ public class MainConfig extends Config {
 	@Comment(value = "Status of the login servers (Yggdrasil)")
 	public String commandCheckStatusAuthserverMojang = "&eDie &6Login-Server&e sind gerade %status%";
 	@Comment(value = "Status of the session servers")
-	public String commandCheckStatusSessionMinecraft = "&eDie &6Session-Server&e sind gerade %status%";
+	public String commandCheckStatusSessionserverMojang = "&eDie &6Session-Server&e sind gerade %status%";
 	@Comment(value = "Status of the skin servers")
 	public String commandCheckStatusSkinsMinecraft = "&eDie &6Skin-Server&e sind gerade %status%";
 	@Comment(value = "Warning when session servers are offline (no players can join)")
@@ -65,12 +65,15 @@ public class MainConfig extends Config {
 	public String commandCheckStatusAccountMojang = "&fDie &eMojang-Account&f Website ist gerade %status%";
 	@Comment(value = "Status of the legacy login servers")
 	public String commandCheckStatusLoginMinecraft = "&fDie alten &eLogin-Server&f sind gerade %status%";
+	@Comment(value = "Status of the legacy session servers")
+	public String commandCheckStatusSessionMinecraft = "&eDie alten &6Session-Server&e sind gerade %status%";
 	
 	@Comment(value = "\n\nPublic broadcasts when a service goes up or down. Use \n for multiple lines. Leave empty to disable.\nService went down\nAfter how many checks the broadcast should be displayed when a service goes down (0 = instantly, 2 = after the second check)? Avoids spamming the chat when the servers are just down for a short time")
 	public int broadcastDownWait = 2;
 	public String broadcastMinecraftNetDown = "";
 	public String broadcastAuthserverMojangDown = "&cDie &lLogin-Server&c sind soeben &4offline&c gegangen.\n&cEs können sich vermutlich keine weiteren Spieler mehr in Minecraft einloggen!";
-	public String broadcastSessionMinecraftDown = "&cDie &lSession-Server&c sind soeben &4offline&c gegangen.\n&cEs können vermutlich keine weiteren Spieler mehr joinen!";
+	public String broadcastSessionserverMojangDown = "&cDie &lSession-Server&c sind soeben &4offline&c gegangen.\n&cEs können vermutlich keine weiteren Spieler mehr joinen!";
+	public String broadcastSessionMinecraftDown = "";
 	public String broadcastSkinsMinecraftDown = "";
 	public String broadcastAuthMojangDown = "";
 	public String broadcastAccountMojangDown = "";
@@ -83,7 +86,8 @@ public class MainConfig extends Config {
 	public String broadcastAuthserverMojangUp = "&aDie &lLogin-Server&a sind soeben &2online&a gegangen.";
 	@Comment(value = "Show broadcast that session servers are still down when login servers go up to avoid confusion")
 	public boolean broadcastSessionStillDownOnLoginUp = true;
-	public String broadcastSessionMinecraftUp = "&aDie &lSession-Server&a sind soeben &2online&a gegangen.\n&aEs können wieder weitere Spieler joinen!";
+	public String broadcastSessionserverMojangUp = "&aDie &lSession-Server&a sind soeben &2online&a gegangen.\n&aEs können wieder weitere Spieler joinen!";
+	public String broadcastSessionMinecraftUp = "";
 	public String broadcastSkinsMinecraftUp = "";
 	public String broadcastAuthMojangUp = "";
 	public String broadcastAccountMojangUp = "";
@@ -92,7 +96,8 @@ public class MainConfig extends Config {
 	public int remainsDownInterval = 20;
 	public String broadcastMinecraftNetStillDown = "";
 	public String broadcastAuthserverMojangStillDown = "&cDie &lLogin-Server&c sind immer noch &4offline&c, es können sich keine weiteren Spieler in Minecraft einloggen!";
-	public String broadcastSessionMinecraftStillDown = "&cDie &lSession-Server&c sind immer noch &4offline&c und es können keine weiteren Spieler joinen!";
+	public String broadcastSessionserverMojangStillDown = "&cDie &lSession-Server&c sind immer noch &4offline&c und es können keine weiteren Spieler joinen!";
+	public String broadcastSessionMinecraftStillDown = "";
 	public String broadcastSkinsMinecraftStillDown = "";
 	public String broadcastAuthMojangStillDown = "";
 	public String broadcastAccountMojangStillDown = "";
