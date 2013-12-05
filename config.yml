@@ -1,6 +1,4 @@
 # Debugging enables more output in the console
-
-# Debugging enables more output in the console
 debug: false
 # All strings use & as the color code character
 # 

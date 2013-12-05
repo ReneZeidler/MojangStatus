@@ -17,6 +17,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class MojangStatus extends Plugin implements Listener {
 	
@@ -319,7 +320,7 @@ public class MojangStatus extends Plugin implements Listener {
 		if(!s.isEmpty()) for(String m : ChatColor.translateAlternateColorCodes('&', s).split("\n")) BungeeCord.getInstance().broadcast(m);
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPing(ProxyPingEvent ev)
 	{
 		//store original MOTD
