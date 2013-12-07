@@ -320,7 +320,7 @@ public class MojangStatus extends Plugin implements Listener {
 		if(!s.isEmpty()) for(String m : ChatColor.translateAlternateColorCodes('&', s).split("\n")) BungeeCord.getInstance().broadcast(m);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPing(ProxyPingEvent ev)
 	{
 		//store original MOTD
